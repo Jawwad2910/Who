@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Meridian Post — World News, Geopolitics & Analysis</title>
+  <meta name="description" content="Meridian Post covers world politics, geopolitics, stock markets and technology with sharp analysis. Founded by J. Asghar."/>
+  <meta name="keywords" content="world news, geopolitics, politics, markets, technology, meridian post"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<div id="navContainer"></div>
+<div id="tickerContainer"></div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-date" id="heroDate"></div>
+  <div class="hero-grid" id="heroGrid">
+    <!-- Hero skeleton -->
+    <div class="hero-main">
+      <div class="skeleton skel-line" style="height:18px;width:90px;margin-bottom:14px;"></div>
+      <div class="skeleton skel-line skel-long" style="height:38px;margin-bottom:8px;"></div>
+      <div class="skeleton skel-line skel-med" style="height:38px;margin-bottom:8px;"></div>
+      <div class="skeleton skel-line" style="height:38px;width:50%;margin-bottom:18px;"></div>
+      <div class="skeleton skel-line skel-long" style="height:13px;margin-bottom:7px;"></div>
+      <div class="skeleton skel-line skel-med" style="height:13px;margin-bottom:7px;"></div>
+      <div class="skeleton skel-line" style="height:13px;width:65%;"></div>
+    </div>
+    <div class="hero-side">
+      <div class="side-item">
+        <div class="skeleton skel-line" style="height:10px;width:80px;margin-bottom:8px;"></div>
+        <div class="skeleton skel-line skel-long" style="height:14px;margin-bottom:5px;"></div>
+        <div class="skeleton skel-line skel-med" style="height:14px;"></div>
+      </div>
+      <div class="side-item">
+        <div class="skeleton skel-line" style="height:10px;width:80px;margin-bottom:8px;"></div>
+        <div class="skeleton skel-line skel-long" style="height:14px;margin-bottom:5px;"></div>
+        <div class="skeleton skel-line skel-med" style="height:14px;"></div>
+      </div>
+      <div class="side-item" style="border-bottom:none;padding-bottom:0">
+        <div class="skeleton skel-line" style="height:10px;width:80px;margin-bottom:8px;"></div>
+        <div class="skeleton skel-line skel-long" style="height:14px;margin-bottom:5px;"></div>
+        <div class="skeleton skel-line skel-med" style="height:14px;"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MAIN LAYOUT -->
+<div class="layout">
+  <div>
+    <!-- LATEST NEWS -->
+    <div class="sec-head">
+      <span class="sec-label">Latest World News</span>
+      <div class="sec-line"></div>
+    </div>
+    <div id="latestNews"></div>
+
+    <!-- PUBLISHED ARTICLES -->
+    <div id="pubSectionWrapper" style="margin-top:52px;display:none;">
+      <div class="sec-head">
+        <span class="sec-label">From the Editor</span>
+        <div class="sec-line"></div>
+      </div>
+      <div class="pub-grid" id="pubGrid"></div>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="widget">
+      <div class="widget-title">📊 Markets</div>
+      <div id="marketWidget"></div>
+    </div>
+
+    <div class="widget">
+      <div class="widget-title">✍️ Editor's Note</div>
+      <div class="quote-box">
+        <div class="quote-text">"The world is not moving toward chaos — it's moving toward a multipolar order the old powers haven't learned to live in yet."</div>
+        <div class="quote-sig">— J. Asghar, Founder &amp; Editor</div>
+      </div>
+    </div>
+
+    <div class="widget">
+      <div class="widget-title">🗂️ Sections</div>
+      <div class="section-links">
+        <a href="geopolitics.html">🌍 Geopolitics <span>→</span></a>
+        <a href="world-politics.html">🏛️ World Politics <span>→</span></a>
+        <a href="markets.html">📈 Markets <span>→</span></a>
+        <a href="technology.html">💻 Technology <span>→</span></a>
+      </div>
+    </div>
+
+    <div class="widget">
+      <div class="widget-title">🔥 Trending</div>
+      <div id="trendingWidget">
+        <div class="trend-item"><span class="trend-num">--</span><div class="skeleton skel-line" style="flex:1;height:12px;border-radius:3px;"></div></div>
+        <div class="trend-item"><span class="trend-num">--</span><div class="skeleton skel-line" style="flex:1;height:12px;border-radius:3px;"></div></div>
+        <div class="trend-item"><span class="trend-num">--</span><div class="skeleton skel-line" style="flex:1;height:12px;border-radius:3px;"></div></div>
+        <div class="trend-item"><span class="trend-num">--</span><div class="skeleton skel-line" style="flex:1;height:12px;border-radius:3px;"></div></div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<div id="footerContainer"></div>
+<div id="pwdModalContainer"></div>
+<div id="editorModalContainer"></div>
+<div id="emailPopupContainer"></div>
+<div id="toastContainer"></div>
+
+<script src="app.js"></script>
+<script>
+  // Inject shared HTML
+  document.getElementById('navContainer').innerHTML = buildNavHTML('index');
+  document.getElementById('tickerContainer').innerHTML = buildTickerHTML();
+  document.getElementById('footerContainer').innerHTML = buildFooterHTML();
+  document.getElementById('pwdModalContainer').innerHTML = buildPasswordModalHTML();
+  document.getElementById('editorModalContainer').innerHTML = buildEditorModalHTML();
+  document.getElementById('emailPopupContainer').innerHTML = buildEmailPopupHTML();
+  document.getElementById('toastContainer').innerHTML = buildToastHTML();
+
+  // Init shared
+  initPage('index');
+
+  // ---- LOAD LATEST NEWS ----
+  async function loadLatestNews() {
+    showSkeletonCards('latestNews', 4);
+    try {
+      const articles = await fetchNews('all');
+      renderNewsCards(articles, 'geopolitics', 'latestNews');
+      buildHero(articles);
+      buildTrending(articles);
+    } catch (e) {
+      document.getElementById('latestNews').innerHTML =
+        '<div class="error-state"><div class="error-icon">📡</div><p>Could not load news right now. Please check your connection.</p><button class="btn-retry" onclick="loadLatestNews()">Try Again</button></div>';
+    }
+  }
+
+  // ---- BUILD HERO ----
+  function buildHero(articles) {
+    if (!articles || !articles.length) return;
+    const main = articles[0];
+    const side = articles.slice(1, 4);
+    const src = cleanSource(main.author || '');
+    const time = timeAgo(main.pubDate);
+
+    document.getElementById('heroGrid').innerHTML =
+      '<div class="hero-main">' +
+        '<span class="hero-tag">Breaking</span>' +
+        '<h1 onclick="goToNewsArticle(\'' + encodeURIComponent(JSON.stringify({
+          title: main.title,
+          description: main.description ? main.description.replace(/<[^>]*>/g,'').slice(0,400) : '',
+          source: src,
+          time: time,
+          url: main.link,
+          image: main.thumbnail && main.thumbnail.startsWith('http') ? main.thumbnail : '',
+          category: 'World News'
+        })) + '\')">' + escHtml(main.title) + '</h1>' +
+        (main.description ? '<p>' + escHtml(main.description.replace(/<[^>]*>/g,'').slice(0,160)) + '...</p>' : '') +
+        '<div class="hero-meta">' +
+          '<span class="author">' + escHtml(src) + '</span>' +
+          '<span>·</span>' +
+          '<span>' + time + '</span>' +
+          '<span class="live-badge"><span class="live-dot"></span>Live</span>' +
+          '<a href="' + escAttr(main.link) + '" target="_blank" rel="noopener" class="btn-read" onclick="event.stopPropagation()">Read Full Story →</a>' +
+        '</div>' +
+      '</div>' +
+      '<div class="hero-side">' +
+        side.map(function(item) {
+          const s = cleanSource(item.author || '');
+          return '<div class="side-item" onclick="goToNewsArticle(\'' + encodeURIComponent(JSON.stringify({
+            title: item.title,
+            description: item.description ? item.description.replace(/<[^>]*>/g,'').slice(0,400) : '',
+            source: s,
+            time: timeAgo(item.pubDate),
+            url: item.link,
+            image: item.thumbnail && item.thumbnail.startsWith('http') ? item.thumbnail : '',
+            category: 'World News'
+          })) + '\')">' +
+            '<div class="side-cat cat-geo">World News</div>' +
+            '<div class="side-title">' + escHtml(item.title) + '</div>' +
+            '<div class="side-time">' + timeAgo(item.pubDate) + '</div>' +
+          '</div>';
+        }).join('') +
+      '</div>';
+  }
+
+  // ---- BUILD TRENDING ----
+  function buildTrending(articles) {
+    const el = document.getElementById('trendingWidget');
+    if (!el || !articles.length) return;
+    el.innerHTML = articles.slice(0, 5).map(function(item, i) {
+      const src = cleanSource(item.author || '');
+      const time = timeAgo(item.pubDate);
+      return '<div class="trend-item" onclick="goToNewsArticle(\'' + encodeURIComponent(JSON.stringify({
+        title: item.title,
+        description: item.description ? item.description.replace(/<[^>]*>/g,'').slice(0,400) : '',
+        source: src,
+        time: time,
+        url: item.link,
+        image: item.thumbnail && item.thumbnail.startsWith('http') ? item.thumbnail : '',
+        category: 'World News'
+      })) + '\')">' +
+        '<span class="trend-num">0' + (i+1) + '</span>' +
+        '<span class="trend-title">' + escHtml(item.title.slice(0, 80)) + (item.title.length > 80 ? '...' : '') + '</span>' +
+      '</div>';
+    }).join('');
+  }
+
+  // ---- LOAD PUBLISHED ARTICLES FROM SUPABASE ----
+  async function loadPublishedArticles() {
+    try {
+      const articles = await getPublishedArticles();
+      const wrapper = document.getElementById('pubSectionWrapper');
+      const grid = document.getElementById('pubGrid');
+      if (!articles || !articles.length) { if (wrapper) wrapper.style.display = 'none'; return; }
+      if (wrapper) wrapper.style.display = 'block';
+      grid.innerHTML = articles.map(function(a) {
+        return '<div class="pub-card">' +
+          '<span class="pub-badge">Live</span>' +
+          (editorUnlocked ? '<button class="pub-delete" onclick="handleDeleteArticle(' + a.id + ',event)" title="Delete">×</button>' : '') +
+          '<div class="pub-cat">' + escHtml(a.category) + '</div>' +
+          '<div class="pub-title" onclick="goToPublishedArticle(' + a.id + ')">' + escHtml(a.title) + '</div>' +
+          '<div class="pub-excerpt">' + escHtml(a.excerpt || '') + '</div>' +
+          '<div class="pub-meta">J. Asghar · ' + timeAgo(a.created_at) + '</div>' +
+        '</div>';
+      }).join('');
+    } catch (e) {
+      console.error('Could not load published articles:', e);
+    }
+  }
+
+  async function handleDeleteArticle(id, e) {
+    e.stopPropagation();
+    if (!editorUnlocked) return;
+    if (!confirm('Delete this article? This cannot be undone.')) return;
+    try {
+      await deleteArticle(id);
+      showToast('Article deleted.');
+      loadPublishedArticles();
+    } catch (err) {
+      showToast('Error deleting article.');
+    }
+  }
+
+  function goToPublishedArticle(id) {
+    localStorage.setItem('mp-pub-article-id', id);
+    window.location.href = 'article.html';
+  }
+
+  // Start loading
+  loadLatestNews();
+  loadPublishedArticles();
+</script>
+</body>
+</html>

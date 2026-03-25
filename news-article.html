@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>News — Meridian Post</title>
+  <meta name="description" content="Read the latest world news on Meridian Post."/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<div id="navContainer"></div>
+<div id="tickerContainer"></div>
+
+<div class="article-page" id="articlePage">
+  <div>
+    <button class="article-back" onclick="history.back()">← Back</button>
+    <div id="articleContent">
+      <!-- Skeleton while loading -->
+      <div class="skeleton skel-line" style="height:12px;width:100px;margin-bottom:14px;"></div>
+      <div class="skeleton skel-line skel-long" style="height:32px;margin-bottom:8px;"></div>
+      <div class="skeleton skel-line skel-med" style="height:32px;margin-bottom:20px;"></div>
+      <div class="skeleton" style="width:100%;aspect-ratio:16/6;border-radius:8px;margin-bottom:26px;"></div>
+      <div class="skeleton skel-line skel-long" style="height:12px;margin-bottom:7px;"></div>
+      <div class="skeleton skel-line skel-med" style="height:12px;margin-bottom:28px;"></div>
+      <div class="skeleton skel-line skel-long" style="height:14px;margin-bottom:8px;"></div>
+      <div class="skeleton skel-line skel-long" style="height:14px;margin-bottom:8px;"></div>
+      <div class="skeleton skel-line skel-med" style="height:14px;margin-bottom:8px;"></div>
+      <div class="skeleton skel-line skel-long" style="height:14px;margin-bottom:8px;"></div>
+      <div class="skeleton skel-line" style="height:14px;width:70%;"></div>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="widget">
+      <div class="widget-title">📊 Markets</div>
+      <div id="marketWidget"></div>
+    </div>
+    <div class="widget">
+      <div class="widget-title">🗂️ Browse</div>
+      <div class="section-links">
+        <a href="index.html">🌐 Home <span>→</span></a>
+        <a href="geopolitics.html">🌍 Geopolitics <span>→</span></a>
+        <a href="world-politics.html">🏛️ World Politics <span>→</span></a>
+        <a href="markets.html">📈 Markets <span>→</span></a>
+        <a href="technology.html">💻 Technology <span>→</span></a>
+      </div>
+    </div>
+    <div class="widget">
+      <div class="widget-title">✍️ Editor's Note</div>
+      <div class="quote-box">
+        <div class="quote-text">"The world is not moving toward chaos — it's moving toward a multipolar order the old powers haven't learned to live in yet."</div>
+        <div class="quote-sig">— J. Asghar, Founder &amp; Editor</div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<div id="footerContainer"></div>
+<div id="pwdModalContainer"></div>
+<div id="editorModalContainer"></div>
+<div id="toastContainer"></div>
+
+<script src="app.js"></script>
+<script>
+  document.getElementById('navContainer').innerHTML = buildNavHTML('');
+  document.getElementById('tickerContainer').innerHTML = buildTickerHTML();
+  document.getElementById('footerContainer').innerHTML = buildFooterHTML();
+  document.getElementById('pwdModalContainer').innerHTML = buildPasswordModalHTML();
+  document.getElementById('editorModalContainer').innerHTML = buildEditorModalHTML();
+  document.getElementById('toastContainer').innerHTML = buildToastHTML();
+
+  initPage('');
+
+  // Load article data from localStorage
+  var raw = localStorage.getItem('mp-news-article');
+  if (!raw) {
+    window.location.href = 'index.html';
+  } else {
+    try {
+      var article = JSON.parse(raw);
+      document.title = article.title + ' — Meridian Post';
+
+      var catMeta = CAT_META['geopolitics'];
+      var content =
+        '<div class="article-cat cat-geo">' + escHtml(article.source || 'World News') + '</div>' +
+        '<h1 class="article-h1">' + escHtml(article.title) + '</h1>';
+
+      if (article.image) {
+        content += '<img class="article-cover" src="' + escAttr(article.image) + '" alt="" onerror="this.style.display=\'none\'">';
+      } else {
+        content += '<div class="article-cover-placeholder" style="background:linear-gradient(135deg,#1a1a2e,#2a2a4e)">🌍</div>';
+      }
+
+      content +=
+        '<div class="article-meta">' +
+          '<span class="source">' + escHtml(article.source || 'News') + '</span>' +
+          '<span>' + (article.time || '') + '</span>' +
+        '</div>';
+
+      if (article.description) {
+        content += '<div class="article-body"><p>' + escHtml(article.description) + '</p></div>';
+      }
+
+      content +=
+        '<div class="article-cta">' +
+          '<p>This article is reported by <strong>' + escHtml(article.source || 'the publisher') + '</strong>. Click below to read the complete story on their website.</p>' +
+          '<a href="' + escAttr(article.url) + '" target="_blank" rel="noopener">Read Full Article on ' + escHtml(article.source || 'Source') + ' ↗</a>' +
+        '</div>';
+
+      document.getElementById('articleContent').innerHTML = content;
+    } catch (e) {
+      window.location.href = 'index.html';
+    }
+  }
+</script>
+</body>
+</html>

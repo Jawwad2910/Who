@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Article — Meridian Post</title>
+  <meta name="description" content="Read articles published on Meridian Post by J. Asghar."/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<div id="navContainer"></div>
+<div id="tickerContainer"></div>
+
+<div class="article-page" id="articlePage">
+  <div>
+    <button class="article-back" onclick="history.back()">← Back</button>
+    <div id="articleContent">
+      <div class="skeleton skel-line" style="height:12px;width:100px;margin-bottom:14px;"></div>
+      <div class="skeleton skel-line skel-long" style="height:32px;margin-bottom:8px;"></div>
+      <div class="skeleton skel-line skel-med" style="height:32px;margin-bottom:20px;"></div>
+      <div class="skeleton" style="width:100%;aspect-ratio:16/6;border-radius:8px;margin-bottom:26px;"></div>
+      <div class="skeleton skel-line skel-long" style="height:14px;margin-bottom:8px;"></div>
+      <div class="skeleton skel-line skel-long" style="height:14px;margin-bottom:8px;"></div>
+      <div class="skeleton skel-line skel-med" style="height:14px;"></div>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="widget">
+      <div class="widget-title">📊 Markets</div>
+      <div id="marketWidget"></div>
+    </div>
+    <div class="widget">
+      <div class="widget-title">🗂️ Browse</div>
+      <div class="section-links">
+        <a href="index.html">🌐 Home <span>→</span></a>
+        <a href="geopolitics.html">🌍 Geopolitics <span>→</span></a>
+        <a href="world-politics.html">🏛️ World Politics <span>→</span></a>
+        <a href="markets.html">📈 Markets <span>→</span></a>
+        <a href="technology.html">💻 Technology <span>→</span></a>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<div id="footerContainer"></div>
+<div id="pwdModalContainer"></div>
+<div id="editorModalContainer"></div>
+<div id="toastContainer"></div>
+
+<script src="app.js"></script>
+<script>
+  document.getElementById('navContainer').innerHTML = buildNavHTML('');
+  document.getElementById('tickerContainer').innerHTML = buildTickerHTML();
+  document.getElementById('footerContainer').innerHTML = buildFooterHTML();
+  document.getElementById('pwdModalContainer').innerHTML = buildPasswordModalHTML();
+  document.getElementById('editorModalContainer').innerHTML = buildEditorModalHTML();
+  document.getElementById('toastContainer').innerHTML = buildToastHTML();
+
+  initPage('');
+
+  var articleId = localStorage.getItem('mp-pub-article-id');
+  if (!articleId) { window.location.href = 'index.html'; }
+
+  async function loadArticle() {
+    try {
+      var data = await supabaseFetch('articles?id=eq.' + articleId + '&select=*');
+      if (!data || !data.length) { window.location.href = 'index.html'; return; }
+      var a = data[0];
+
+      document.title = a.title + ' — Meridian Post';
+
+      var catMap = { 'Geopolitics':'cat-geo','World Politics':'cat-pol','Markets':'cat-mkt','Technology':'cat-tech','Opinion':'cat-opin' };
+      var catClass = catMap[a.category] || 'cat-geo';
+      var iconBgMap = {
+        'Geopolitics':'linear-gradient(135deg,#1a1a2e,#16213e)',
+        'World Politics':'linear-gradient(135deg,#0d1b2a,#1b2a3a)',
+        'Markets':'linear-gradient(135deg,#0a1a0a,#1a2a1a)',
+        'Technology':'linear-gradient(135deg,#1a0a2e,#2d1a4a)',
+        'Opinion':'linear-gradient(135deg,#1a1400,#3a2c00)'
+      };
+      var bg = iconBgMap[a.category] || iconBgMap['Geopolitics'];
+
+      var paragraphs = (a.body || '').split(/\n\n+/).filter(function(p){ return p.trim(); });
+
+      var html =
+        '<div class="article-cat ' + catClass + '">' + escHtml(a.category) + '</div>' +
+        '<h1 class="article-h1">' + escHtml(a.title) + '</h1>' +
+        '<div class="article-cover-placeholder" style="background:' + bg + '">' + escHtml(a.icon || '🌍') + '</div>' +
+        '<div class="article-meta">' +
+          '<span class="source">J. Asghar</span>' +
+          '<span>Founder &amp; Editor, Meridian Post</span>' +
+          '<span>' + timeAgo(a.created_at) + '</span>' +
+        '</div>' +
+        '<div class="article-body">' +
+          paragraphs.map(function(p, i) {
+            return '<p style="' + (i === 0 ? 'font-size:1.08rem;' : '') + '">' + escHtml(p.trim()) + '</p>';
+          }).join('') +
+        '</div>';
+
+      if (editorUnlocked) {
+        html += '<div style="margin-top:36px;display:flex;gap:10px;">' +
+          '<button onclick="handleDelete(' + a.id + ')" style="padding:10px 20px;background:var(--surface2);border:1px solid var(--border);color:var(--red);border-radius:6px;font-size:0.78rem;font-weight:600;transition:border-color 0.2s;" onmouseover="this.style.borderColor=\'var(--red)\'" onmouseout="this.style.borderColor=\'var(--border)\'">🗑 Delete Article</button>' +
+        '</div>';
+      }
+
+      document.getElementById('articleContent').innerHTML = html;
+    } catch (e) {
+      document.getElementById('articleContent').innerHTML =
+        '<div class="error-state"><div class="error-icon">⚠️</div><p>Could not load this article. Please go back and try again.</p></div>';
+    }
+  }
+
+  async function handleDelete(id) {
+    if (!editorUnlocked) return;
+    if (!confirm('Delete this article permanently?')) return;
+    try {
+      await deleteArticle(id);
+      showToast('Article deleted.');
+      setTimeout(function(){ window.location.href = 'index.html'; }, 1500);
+    } catch (e) {
+      showToast('Error deleting article.');
+    }
+  }
+
+  loadArticle();
+</script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Geopolitics — Meridian Post</title>
+  <meta name="description" content="Latest geopolitics news — power shifts, conflicts, alliances and global order. Meridian Post."/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<div id="navContainer"></div>
+<div id="tickerContainer"></div>
+
+<div class="page-hero" style="background:linear-gradient(to bottom, rgba(224,90,43,0.07), transparent);">
+  <div class="page-hero-label">Section</div>
+  <h1>🌍 Geopolitics</h1>
+  <p>Power shifts, conflicts, sanctions, alliances and the forces reshaping the international order. No noise, just analysis.</p>
+</div>
+
+<div class="layout">
+  <div>
+    <div class="sec-head">
+      <span class="sec-label">Latest Geopolitics</span>
+      <div class="sec-line"></div>
+    </div>
+    <div id="newsGrid"></div>
+  </div>
+  <aside class="sidebar">
+    <div class="widget">
+      <div class="widget-title">📊 Markets</div>
+      <div id="marketWidget"></div>
+    </div>
+    <div class="widget">
+      <div class="widget-title">📂 Other Sections</div>
+      <div class="section-links">
+        <a href="world-politics.html">🏛️ World Politics <span>→</span></a>
+        <a href="markets.html">📈 Markets <span>→</span></a>
+        <a href="technology.html">💻 Technology <span>→</span></a>
+        <a href="index.html">🌐 Home <span>→</span></a>
+      </div>
+    </div>
+    <div class="widget">
+      <div class="widget-title">✍️ Editor's Note</div>
+      <div class="quote-box">
+        <div class="quote-text">"Every geopolitical conflict has an economic root. Follow the money, find the truth."</div>
+        <div class="quote-sig">— J. Asghar, Founder &amp; Editor</div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<div id="footerContainer"></div>
+<div id="pwdModalContainer"></div>
+<div id="editorModalContainer"></div>
+<div id="toastContainer"></div>
+
+<script src="app.js"></script>
+<script>
+  document.getElementById('navContainer').innerHTML = buildNavHTML('geopolitics');
+  document.getElementById('tickerContainer').innerHTML = buildTickerHTML();
+  document.getElementById('footerContainer').innerHTML = buildFooterHTML();
+  document.getElementById('pwdModalContainer').innerHTML = buildPasswordModalHTML();
+  document.getElementById('editorModalContainer').innerHTML = buildEditorModalHTML();
+  document.getElementById('toastContainer').innerHTML = buildToastHTML();
+  initPage('geopolitics');
+
+  async function load() {
+    showSkeletonCards('newsGrid', 6);
+    const articles = await fetchNews('geopolitics');
+    renderNewsCards(articles, 'geopolitics', 'newsGrid');
+  }
+  load();
+</script>
+</body>
+</html>
